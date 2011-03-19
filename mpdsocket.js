@@ -17,6 +17,7 @@ mpdSocket.prototype = {
 	handleData: function(data) {
 		var response = new Object;
 		var lines = data.split("\n");
+		var i = 0;
 		for (var l in lines) {
 			if (lines[l].match(/^ACK/)) {
 				response.error = data;
@@ -29,7 +30,27 @@ mpdSocket.prototype = {
 				this.callbacks.shift()(response);
 				return;
 			} else {
-				response[lines[l].substr(0,lines[l].indexOf(":"))] = lines[l].substr((lines[l].indexOf(":"))+2);
+				var attr = lines[l].substr(0,lines[l].indexOf(":"));
+				var value = lines[l].substr((lines[l].indexOf(":"))+1);
+				value = value.replace(/^\s+|\s+$/g, ''); // trim whitespace
+				if (!(response.ordered_list)) {
+					if (typeof(response[attr]) != 'undefined') {
+						//make ordered list
+						response.ordered_list = true;
+						response[++i] = response;
+						response[++i] = new Object;
+						response[i][attr] = value;
+					} else {
+						response[attr] = value;
+					}
+				} else {
+					if (typeof(response[i][attr]) != 'undefined') {
+						response[++1] = new Object;
+						response[i][attr] = value;
+					} else {
+						response[i][attr] = value;
+					}
+				}
 			}
 		}
 	},
