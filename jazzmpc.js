@@ -13,7 +13,7 @@ mpd.on('connect',function() {
 	                      'clear','playlistinfo','shuffle','listplaylists','listall',
 	                      'listallinfo','lsinfo','update','rescan','disableoutput',
 	                      'enableoutput','outputs','commands','notcommands',
-	                      'tagtypes','urlhandlers','decoders'];
+	                      'tagtypes','urlhandlers','decoders','channels','readmessages'];
 	
 	var simpleArgFuncList = ['consume','crossfade','mixrampdb','mixrampdelay',
 	                         'random','repeat','setvol','single','replay_gain_mode',
@@ -21,7 +21,7 @@ mpd.on('connect',function() {
 	                         'playlistinfo','playlistid','plchanges','plchangesposid',
 	                         'shuffle','listplaylist','listplaylistinfo','load',
 	                         'playlistclear','rm','save','listall','listallinfo',
-	                         'lsinfo','update','rescan'];
+	                         'lsinfo','update','rescan','subscribe','unsubscribe'];
 
 	//other functions
 	mpdfn('seek',true,'/mpd/seek/:a/:b');
@@ -38,6 +38,7 @@ mpd.on('connect',function() {
 	mpdfn('findadd',true,'/mpd/findadd/:a/:b');
 	mpdfn('list',true,'/mpd/list/:a/:b?');
 	mpdfn('search',true,'/mpd/search/:a/:b');
+	mpdfn('sendmessage',true,'/mpd/sendmessage/:a/:b');
 
 	for (var i in simpleFuncList) {
 		mpdfn(simpleFuncList[i],false);
