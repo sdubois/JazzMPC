@@ -20,26 +20,28 @@ mpdSocket.prototype = {
 		var i = 0;
 		for (var l in lines) {
 			if (lines[l].match(/^ACK/)) {
-				response.error = data;
+				response._error = lines[l].substr(13);
+				response._OK = false;
 				this.callbacks.shift()(response)
 				return;
 			} else if (lines[l].match(/^OK MPD/)) {
 				this.version = lines[l].split(' ')[2];
 				return;
 			} else if (lines[l].match(/^OK/)) {
+				response._OK = true;
 				this.callbacks.shift()(response);
 				return;
 			} else {
 				var attr = lines[l].substr(0,lines[l].indexOf(":"));
 				var value = lines[l].substr((lines[l].indexOf(":"))+1);
 				value = value.replace(/^\s+|\s+$/g, ''); // trim whitespace
-				if (!(response.ordered_list)) {
+				if (!(response._ordered_list)) {
 					if (typeof(response[attr]) != 'undefined') {
 						//make ordered list
 						var tempResponse = { 1: {} };
 						tempResponse[++i] = response;
 						response = tempResponse;
-						response.ordered_list = true;
+						response._ordered_list = true;
 						response[++i] = new Object;
 						response[i][attr] = value;
 					} else {
@@ -56,7 +58,11 @@ mpdSocket.prototype = {
 			}
 		}
 	},
-			
+	
+	on: function(event, fn) {
+		this.socket.on(event,fn);
+	},
+		
 	open: function(host,port) {
 		var self = this;
 		if (!(this.isOpen)) {
