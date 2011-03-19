@@ -47,7 +47,7 @@ mpdSocket.prototype = {
 					}
 				} else {
 					if (typeof(response[i][attr]) != 'undefined') {
-						response[++1] = new Object;
+						response[++i] = new Object;
 						response[i][attr] = value;
 					} else {
 						response[i][attr] = value;
