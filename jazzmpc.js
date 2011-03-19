@@ -1,6 +1,6 @@
 var routes = new require('routes').Router();
 var http = require('http');
-var mpdSocket = require('./mpdsocket');
+var mpdSocket = require('mpdsocket');
 var io = require("socket.io");
 var jazzmpc;
 
@@ -8,12 +8,36 @@ var mpd = new mpdSocket('192.168.189.130',6600);
 
 mpd.on('connect',function() {
 	//batch establish functions
-	var simpleFuncList = ['clearerror','currentsong','playlist','mpdStatus','stats',
-	                      'replay_gain_status','next','previous','stop'];
+	var simpleFuncList = ['clearerror','currentsong','playlist','stats','status',
+	                      'play','pause','replay_gain_status','next','previous','stop',
+	                      'clear','playlistinfo','shuffle','listplaylists','listall',
+	                      'listallinfo','lsinfo','update','rescan','disableoutput',
+	                      'enableoutput','outputs','commands','notcommands',
+	                      'tagtypes','urlhandlers','decoders'];
 	
 	var simpleArgFuncList = ['consume','crossfade','mixrampdb','mixrampdelay',
 	                         'random','repeat','setvol','single','replay_gain_mode',
-	                         'pause','play','playid','password'];
+	                         'pause','play','playid','password','add','delete','deleteid',
+	                         'playlistinfo','playlistid','plchanges','plchangesposid',
+	                         'shuffle','listplaylist','listplaylistinfo','load',
+	                         'playlistclear','rm','save','listall','listallinfo',
+	                         'lsinfo','update','rescan'];
+
+	//other functions
+	mpdfn('seek',true,'/mpd/seek/:a/:b');
+	mpdfn('seekid',true,'/mpd/seekid/:a/:b');
+	mpdfn('addid',true,'/mpd/addid/:a/:b?');
+	mpdfn('swap',true,'/mpd/swap/:a/:b');
+	mpdfn('swapid',true,'/mpd/swap/:a/:b');
+	mpdfn('playlistid',true,'/mpd/playlistid/:a/:b');
+	mpdfn('playlistdelete',true,'/mpd/playlistdelete/:a/:b');
+	mpdfn('playlistmove',true,'/mpd/playlistmove/:a/:b/:c');
+	mpdfn('rename',true,'/mpd/rename/:a/:b');
+	mpdfn('count',true,'/mpd/count/:a/:b');
+	mpdfn('find',true,'/mpd/find/:a/:b');
+	mpdfn('findadd',true,'/mpd/findadd/:a/:b');
+	mpdfn('list',true,'/mpd/list/:a/:b?');
+	mpdfn('search',true,'/mpd/search/:a/:b');
 
 	for (var i in simpleFuncList) {
 		mpdfn(simpleFuncList[i],false);
@@ -28,9 +52,9 @@ mpd.on('connect',function() {
 		var res = this;
 	        mpd.send(req,function(r) {
 		   if (typeof(r) == 'object') {
-		      res.end(JSON.stringify(r));
+		      res.end(JSON.stringify(r) + "\n");
 		   } else {
-		      res.end(r);
+		      res.end(r + "\n");
 		   }
 		});
 	    }
@@ -43,14 +67,19 @@ mpd.on('connect',function() {
 		for (var i in param) {
 			query += param[i] + " ";
 		}
+
 		mpd.send(query,function(r) {
-		   return JSON.stringify(r);
+		   if (typeof(r) == 'object') {
+		      res.end(JSON.stringify(r) + "\n");
+		   } else {
+		      res.end(r + "\n");
+		   }
 		});
 	    }
 	}
 	
 	function mpdfn(req,arg,route) {
-		var evalString = 'var mpd_' + req + ' = _simpleWrite';
+		var evalString = "var mpd_" + req + ' = _simpleWrite';
 		if (arg) evalString += 'Arg';
 		evalString += '("' + req + '");';
 		eval(evalString);
@@ -68,19 +97,19 @@ mpd.on('connect',function() {
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			if (JSON.stringify(routed.params) != "{}") {
 				//we have parameters we need to pass
-				routed.fn.apply(res,routed.params);
+				routed.fn.call(res,routed.params);
 			} else {
-				routed.fn.apply(res);
+				routed.fn.call(res);
 			}
 		} else {
 			//unacceptable request
-			res.writeHead(200, {'Content-Type': 'text/html'});
-			res.end("No.");
+			res.writeHead(404);
+			res.end("Not found");
 		}
 	});
 	
 	jazzmpc.listen(80);
-
+/*
 	//initialize IdleSocket
 	var mpd2 = new mpdSocket('192.168.189.130','6600');
 	var idlesocket = io.listen(jazzmpc);
@@ -98,10 +127,10 @@ mpd.on('connect',function() {
 	mpd2.on('connect',idleLoop);
 	
 	idlesocket.on("connection",function(connection) {
-	   console.log("Got a connection");
 	   connection.send("OK IDLESOCKET");
 	   broadcast = function(msg) {
 	   	connection.broadcast(msg);
 	   }
 	});
+*/
 });
