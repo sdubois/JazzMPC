@@ -36,8 +36,10 @@ mpdSocket.prototype = {
 				if (!(response.ordered_list)) {
 					if (typeof(response[attr]) != 'undefined') {
 						//make ordered list
+						var tempResponse = { 1: {} };
+						tempResponse[++i] = response;
+						response = tempResponse;
 						response.ordered_list = true;
-						response[++i] = response;
 						response[++i] = new Object;
 						response[i][attr] = value;
 					} else {
