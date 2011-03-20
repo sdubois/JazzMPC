@@ -1,0 +1,46 @@
+<!doctype html>
+<head>
+<title>JazzMPC</title>
+<link rel="stylesheet" href="css/style.css" type="text/css"/>
+<link type="text/css" href="css/jquery-ui.css" rel="stylesheet" />
+<script type="text/javascript" src="jquery/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="jquery/jquery-ui-1.8.11.custom.min.js"></script>
+<script>
+	$(function(){
+		$( "#sortable" ).sortable();
+		$( "#sortable" ).disableSelection();
+	});
+	/**
+	function sendMpd(cmd,cb) {
+        var command;
+        foreach(var c in cmd) {
+                command += cmd[c];
+        }
+        $.ajax('/mpd/' + command,{ complete: cb });
+	} 
+	$( "#sortable" ).sortable({
+	update: function(event, ui) { ... }
+	});
+	**/
+</script>
+
+</head>
+<body>
+<div id="top">
+<h1>JazzMPC</h1>
+</div>
+
+<div class="playlist">
+
+<ul id="sortable">
+	<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 1</li>
+	<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 2</li>
+	<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 3</li>
+	<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 4</li>
+	<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 5</li>
+	<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 6</li>
+	<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 7</li>
+</ul>
+
+</div>
+</body>
