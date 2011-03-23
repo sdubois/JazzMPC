@@ -4,8 +4,10 @@ var fs = require('fs');
 var mpdSocket = require('mpdsocket');
 var qs = require('querystring');
 var io = require("socket.io");
+var net = require('net');
+var settings = require('./settings');
 
-var mpd = new mpdSocket('192.168.189.130',6600);
+var mpd = new mpdSocket(settings.host,settings.port);
 
 mpd.on('connect',function() {
 	//batch establish functions
@@ -21,7 +23,7 @@ mpd.on('connect',function() {
 	                      'playlistinfo','playlistid','plchanges','plchangesposid',
 	                      'shuffle','listplaylist','listplaylistinfo','load',
 	                      'playlistclear','rm','save','listall','listallinfo',
-	                      'lsinfo','update','rescan','subscribe','unsubscribe',
+	                      'lsinfo','subscribe','unsubscribe',
 	                      'seek','seekid','addid','swap','swapid','playlistid',
 	                      'playlistdelete','playlistmove','rename','count','find',
 	                      'findadd','list','search','sendmessage'];
@@ -32,6 +34,7 @@ mpd.on('connect',function() {
 
 	function sendFile(path) {
 		var res = this;
+		if (path.c) path = path.c;
 		fs.readFile(__dirname + path,function(err,data) {
 			if (err) {
 				res.writeHead(404);
@@ -48,27 +51,20 @@ mpd.on('connect',function() {
 	    return function(param) {
 		var res = this;
 		if (!(param)) {
-		        mpd.send(req,function(r) {
-			   if (typeof(r) == 'object') {
-			      res.end(JSON.stringify(r) + "\n");
-			   } else {
-			      res.end(r + "\n");
-			   }
-			});
+			var query = req;
 		} else {
 			var query = req + " ";
 			for (var i in param) {
 				query += decodeURI(param[i]) + " ";
 			}
-	
-			mpd.send(query,function(r) {
-			   if (typeof(r) == 'object') {
-			      res.end(JSON.stringify(r) + "\n");
-			   } else {
-			      res.end(r + "\n");
-			   }
-			});
 		}
+		mpd.send(query,function(r) {
+		   if (typeof(r) == 'object') {
+		      res.end(JSON.stringify(r) + "\n");
+		   } else {
+		      res.end(r + "\n");
+		   }
+		});
 	    }
 	}
 	
@@ -81,6 +77,8 @@ mpd.on('connect',function() {
 		routes.addRoute(route,eval("mpd_" + req));
 	}
 	
+	routes.addRoute('/css/:c',sendFile);
+
 	//initialize server
 	var jazzmpc = http.createServer(function(req,res) {
 		console.log(req.url);
@@ -97,10 +95,14 @@ mpd.on('connect',function() {
 				req.on('end',function() {
 					var postParams = qs.parse(postData);
 					routed.fn.call(res,postParams);
+//					res.end();
 				});
+			} else {
+				routed.fn.call(res);
+//				res.end();
 			}
 		} else if (req.url == "/index.html") {
-			sendFile.call(res,"/index.html");
+			sendFile.call(res,"/test.html");
 		} else {
 			//unacceptable request
 			res.writeHead(404);
@@ -109,28 +111,37 @@ mpd.on('connect',function() {
 	});
 	
 	jazzmpc.listen(80);
-/*
+
 	//initialize IdleSocket
-	var mpd2 = new mpdSocket('192.168.189.130','6600');
+	var mpd2 = net.createConnection(settings.port,settings.host);
+	mpd2.setEncoding('UTF-8');
+
 	var idlesocket = io.listen(jazzmpc);
-	var broadcast = function(){ };	
 
 	function idleLoop() {
 		console.log("In idle loop");
-		mpd2.send("idle",function idleMsgHandler(r) {
-			broadcast(r);
-			console.log(r);
-			mpd2.send("idle",idleMsgHandler);
-		});
+		mpd2.write("idle\n");
 	}
 	
 	mpd2.on('connect',idleLoop);
-	
+	mpd2.on('disconnect',function() { mpd2 = net.createConnection(settings.port,settings.host); });
+
 	idlesocket.on("connection",function(connection) {
 	   connection.send("OK IDLESOCKET");
-	   broadcast = function(msg) {
-	   	connection.broadcast(msg);
-	   }
+	   mpd2.removeAllListeners('data');
+	   mpd2.on('data',function(data) {
+		var r = { '_OK': false };
+		var lines = data.split("\n");
+		for (var i in lines) {
+			if (lines[i].match(/^changed/)) {
+				r.changed = lines[i].substr((lines[i].indexOf(":"))+2);
+				r._OK = true;
+			}
+		}
+		mpd2.write("idle\n");
+		console.log(r);
+		connection.broadcast(JSON.stringify(r));
+	   });
 	});
-*/
+
 });
