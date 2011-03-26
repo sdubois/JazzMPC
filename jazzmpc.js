@@ -16,14 +16,14 @@ mpd.on('connect',function() {
 	                      'clear','playlistinfo','shuffle','listplaylists','listall',
 	                      'listallinfo','lsinfo','update','rescan','disableoutput',
 	                      'enableoutput','outputs','commands','notcommands',
-	                      'tagtypes','urlhandlers','decoders','channels','readmessages',
+	                      'tagtypes','urlhandlers','command_list_end','channels','readmessages',
 	                      'consume','crossfade','mixrampdb','mixrampdelay',
 	                      'random','repeat','setvol','single','replay_gain_mode',
 	                      'pause','play','playid','password','add','delete','deleteid',
 	                      'playlistinfo','playlistid','plchanges','plchangesposid',
 	                      'shuffle','listplaylist','listplaylistinfo','load',
 	                      'playlistclear','rm','save','listall','listallinfo',
-	                      'lsinfo','subscribe','unsubscribe',
+	                      'lsinfo','subscribe','unsubscribe','command_list_begin',
 	                      'seek','seekid','addid','swap','swapid','playlistid',
 	                      'playlistdelete','playlistmove','rename','count','find',
 	                      'findadd','list','search','sendmessage'];
@@ -34,7 +34,7 @@ mpd.on('connect',function() {
 
 	function sendFile(path) {
 		var res = this;
-		if (path.c) path = path.c;
+//		if (path.c) path = path.c;
 		fs.readFile(__dirname + path,function(err,data) {
 			if (err) {
 				res.writeHead(404);
@@ -103,6 +103,8 @@ mpd.on('connect',function() {
 			}
 		} else if (req.url == "/index.html") {
 			sendFile.call(res,"/test.html");
+		} else if (req.url == "/blah.html") {
+			sendFile.call(res,"/index.html");
 		} else {
 			//unacceptable request
 			res.writeHead(404);

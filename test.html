@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.min.js"></script>
+<script type="text/javascript">
+function _mpd_ajax(cmd,cb) {
+	var command = cmd[0];
+	var arg = new Object;
+	if (cmd[1]) arg["a"] = cmd[1];
+	if (cmd[2]) arg["b"] = cmd[2];
+
+	$.ajax('/mpd/' + command, { complete: cb, data: arg, type: 'POST' });
+}
+
+function update(xhr,stat) {
+	if (stat == "success") {
+		$("#resp").html(xhr.responseText);
+	}
+}
+
+function mpdCmd(v1,v2,v3) {
+	if (v2 == "") {
+		_mpd_ajax([encodeURI(v1)],update);
+	} else if (v3 == "") {
+		_mpd_ajax([encodeURI(v1),encodeURI(v2)],update);
+	} else {
+		_mpd_ajax([encodeURI(v1),encodeURI(v2),encodeURI(v3)],update);
+	}
+}
+
+$(document).ready(function() {
+	$("a").click(function(evt) {
+		mpdCmd($("#t1").val(),$("#t2").val(),$("#t3").val());
+		evt.preventDefault();
+	});
+});
+</script>
+</head>
+<body>
+<input type="text" id="t1" />
+<input type="text" id="t2" />
+<input type="text" id="t3" />
+<a href="#">Submit me</a>
+
+<p id="resp" />
+</body>
+</html>
