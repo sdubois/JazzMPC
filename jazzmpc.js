@@ -102,9 +102,9 @@ mpd.on('connect',function() {
 //				res.end();
 			}
 		} else if (req.url == "/index.html") {
-			sendFile.call(res,"/test.html");
-		} else if (req.url == "/blah.html") {
 			sendFile.call(res,"/index.html");
+		} else if (req.url == "/test.html") {
+			sendFile.call(res,"/test.html");
 		} else {
 			//unacceptable request
 			res.writeHead(404);
