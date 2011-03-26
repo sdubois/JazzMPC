@@ -6,6 +6,7 @@ var qs = require('querystring');
 var io = require("socket.io");
 var net = require('net');
 var settings = require('./settings');
+var mime = require('mime');
 
 var mpd = new mpdSocket(settings.host,settings.port);
 
@@ -34,13 +35,11 @@ mpd.on('connect',function() {
 
 	function sendFile(path) {
 		var res = this;
-//		if (path.c) path = path.c;
-		fs.readFile(__dirname + path,function(err,data) {
+		fs.readFile(__dirname + "/static" + path,function(err,data) {
 			if (err) {
 				res.writeHead(404);
 				res.end("Not found\n");
 			} else {
-				res.writeHead(200, { 'Content-Type': 'text/html' });
 				res.write(data,'utf-8');
 				res.end();
 			}
@@ -77,7 +76,7 @@ mpd.on('connect',function() {
 		routes.addRoute(route,eval("mpd_" + req));
 	}
 	
-	routes.addRoute('/css/:c',sendFile);
+	routes.addRoute('^/*$',sendFile);
 
 	//initialize server
 	var jazzmpc = http.createServer(function(req,res) {
@@ -85,7 +84,8 @@ mpd.on('connect',function() {
 		var routed = routes.match(req.url);
 		if (routed) {
 			//acceptable request
-			res.writeHead(200, {'Content-Type': 'text/plain'});
+			res.writeHead(200, {'Content-Type': mime.lookup(req.url)});
+			console.log(mime.lookup(req.url));
 			if (req.method == "POST") {
 				//we have parameters we need to pass
 				var postData = "";
@@ -98,13 +98,9 @@ mpd.on('connect',function() {
 //					res.end();
 				});
 			} else {
-				routed.fn.call(res);
+				routed.fn.call(res,req.url);
 //				res.end();
 			}
-		} else if (req.url == "/index.html") {
-			sendFile.call(res,"/index.html");
-		} else if (req.url == "/test.html") {
-			sendFile.call(res,"/test.html");
 		} else {
 			//unacceptable request
 			res.writeHead(404);
