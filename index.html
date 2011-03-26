@@ -10,24 +10,34 @@
 		$( "#sortable" ).sortable();
 		$( "#sortable" ).disableSelection();
 	});
-	/**
+	/*
 	function sendMpd(cmd,cb) {
         var command;
-        foreach(var c in cmd) {
+        for (var c in cmd) {
                 command += cmd[c];
         }
         $.ajax('/mpd/' + command,{ complete: cb });
-	} 
+	}
+	
 	$( "#sortable" ).sortable({
-	update: function(event, ui) { ... }
+	update: sendMpd(['play','1'],function(xhr,status));
 	});
-	**/
+	*/
 </script>
 
 </head>
 <body>
 <div id="top">
 <h1>JazzMPC</h1>
+<div id="controls">
+<ul>
+  <li><a href="prev"><img src="controls/prev.png" width="40"  alt="prev"/></a></li>
+  <li><a href="play"><img src="controls/play.png" width="40"  alt="prev"/></a></li>
+  <li><a href="next"><img src="controls/next.png" width="40"  alt="prev"/></a></li>
+  <li><a href="pause"><img src="controls/pause.png" width="40"  alt="prev"/></a></li>
+  <li><a href="stop"><img src="controls/stop.png" width="40"  alt="prev"/></a></li>
+</ul>
+</div>
 </div>
 
 <div class="playlist">
