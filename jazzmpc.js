@@ -80,12 +80,11 @@ mpd.on('connect',function() {
 
 	//initialize server
 	var jazzmpc = http.createServer(function(req,res) {
-		console.log(req.url);
+		console.log('[' + req.connection.remoteAddress  + '] ' +req.url);
 		var routed = routes.match(req.url);
 		if (routed) {
 			//acceptable request
 			res.writeHead(200, {'Content-Type': mime.lookup(req.url)});
-			console.log(mime.lookup(req.url));
 			if (req.method == "POST") {
 				//we have parameters we need to pass
 				var postData = "";
