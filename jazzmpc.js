@@ -8,7 +8,7 @@ var net = require('net');
 var settings = require('./settings');
 var mime = require('mime');
 
-var mpd = new mpdSocket(settings.host,settings.port);
+var mpd = new mpdSocket(settings.MPD.host,settings.MPD.port);
 
 mpd.on('connect',function() {
 	//batch establish functions
@@ -107,10 +107,10 @@ mpd.on('connect',function() {
 		}
 	});
 	
-	jazzmpc.listen(80);
+	settings.JazzMPC.host ? jazzmpc.listen(settings.JazzMPC.port,settings.JazzMPC.host) : jazzmpc.listen(settings.JazzMPC.port);
 
 	//initialize IdleSocket
-	var mpd2 = net.createConnection(settings.port,settings.host);
+	var mpd2 = net.createConnection(settings.MPD.port,settings.MPD.host);
 	mpd2.setEncoding('UTF-8');
 
 	var idlesocket = io.listen(jazzmpc);
@@ -121,7 +121,7 @@ mpd.on('connect',function() {
 	}
 	
 	mpd2.on('connect',idleLoop);
-	mpd2.on('disconnect',function() { mpd2 = net.createConnection(settings.port,settings.host); });
+	mpd2.on('disconnect',function() { mpd2 = net.createConnection(settings.MPD.port,settings.MPD.host); });
 
 	idlesocket.on("connection",function(connection) {
 	   connection.send("OK IDLESOCKET");

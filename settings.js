@@ -1,6 +1,13 @@
 //Settings for JazzMPC
 
 module.exports = {
-	'host': '192.168.189.130',
-	'port': 6600
+	'MPD': {
+		'host': 'localhost',
+		'port': 6600
+	},
+
+	'JazzMPC': {
+		'host': 'localhost',
+		'port': 80
+	}
 }
