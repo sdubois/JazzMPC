@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>jQuery Scroller plugin v.1.0 by Max Vergelli</title>
+<meta name="description" content="Developed by Max Vergelli." />
+<meta name="keywords" content="" />
+<style type="text/css">
+
+	/* CSS for the scrollers */
+	div.horizontal_scroller, div.vertical_scroller{
+		position:relative;
+		height:24px;
+		width:500px;
+		display:block;
+		overflow:hidden;
+		border:#CCCCCC 1px solid;
+	}
+	div.scrollingtext{
+		position:absolute;
+		white-space:nowrap;
+		font-family:'Trebuchet MS',Arial;
+		font-size:18px;
+		font-weight:bold;
+		color:#000000;
+	}
+
+	/* style needed only for this example */
+	span{margin:5px;padding:8px 12px;width:150px;background-color:#0066CC;color:#FFFFFF;border:#003366 1px solid;display:block;float:left;text-align:center;}
+	span:hover{background-color:#0099CC}
+	#soccer_ball_container{width:500px;height:80px;}
+	#soccer_ball_container .scrollingtext{width:40px;height:80px;}
+	#soccer_ball{display:block;position:absolute;top:0px;left:0px;}
+
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js" type="text/javascript"></script>
+<script src="jquery.Scroller-1.0.min.js" type="text/javascript"></script> 
+<script type="text/javascript">
+<!--
+$(document).ready(function() {
+
+	//create scroller for each element with "horizontal_scroller" class...
+	$('.horizontal_scroller').SetScroller({	velocity: 	 60,
+											direction: 	 'horizontal',
+											startfrom: 	 'right',
+											loop:		 'infinite',
+											movetype: 	 'linear',
+											onmouseover: 'pause',
+											onmouseout:  'play',
+											onstartup: 	 'play',
+											cursor: 	 'pointer'
+										});
+	/*
+		All possible values for options...
+		
+		velocity: 		from 1 to 99 								[default is 50]						
+		direction: 		'horizontal' or 'vertical' 					[default is 'horizontal']
+		startfrom: 		'left' or 'right' for horizontal direction 	[default is 'right']
+						'top' or 'bottom' for vertical direction	[default is 'bottom']
+		loop:			from 1 to n+, or set 'infinite'				[default is 'infinite']
+		movetype:		'linear' or 'pingpong'						[default is 'linear']
+		onmouseover:	'play' or 'pause'							[default is 'pause']
+		onmouseout:		'play' or 'pause'							[default is 'play']
+		onstartup: 		'play' or 'pause'							[default is 'play']
+		cursor: 		'pointer' or any other CSS style			[default is 'pointer']
+	*/
+
+	//how to overwrite options after setup and without deleting the other settings...
+	$('#no_mouse_events').ResetScroller({	onmouseover: 'play', onmouseout: 'play'   });
+	$('#scrollercontrol').ResetScroller({	velocity: 85, startfrom: 'left'   });
+
+	//if you need to remove the scrolling animation, uncomment the following line...
+	//$('#scrollercontrol').RemoveScroller();
+
+	//how to play or stop scrolling animation outside the scroller... 
+	$('#play_scrollercontrol').mouseover(function(){   $('#scrollercontrol').PlayScroller();   });
+	$('#stop_scrollercontrol').mouseover(function(){   $('#scrollercontrol').PauseScroller();  });		
+
+	//create a vertical scroller...	
+	$('.vertical_scroller').SetScroller({	velocity: 80, direction: 'vertical'  });		
+	
+	//"$('#soccer_ball_container')" inherits scrolling options from "$('.horizontal_scroller')",
+	// then I reset new options; besides, "$('#soccer_ball_container')" will wraps and scrolls the bouncing animation...
+	$('#soccer_ball_container').ResetScroller({	 velocity: 85, movetype: 'pingpong', onmouseover: 'play', onmouseout: 'play'  });
+
+	//create soccer ball bouncing animation...
+	$('#soccer_ball').bind('bouncer', function(){
+			$(this).animate({top:42}, 500, 'linear').animate({top:5}, 500, 'linear', function(){$('#soccer_ball').trigger('bouncer');});			
+	}).trigger('bouncer');
+
+});
+//-->
+</script>
+</head>
+<body style="margin:30px;">
+<table border="0" cellspacing="5" cellpadding="0">
+  <tr>
+    <td valign="top"><img src="logo.gif" alt="jQuery Scroller" style="border:0px;" /></td>
+    <td valign="top">
+		<h1>jQuery Scroller v.1.0 </h1>
+		<p>developed by  Max Vergelli<br />
+		<br />
+		Download Plugin at <a href="http://plugins.jquery.com/project/jqScroller/">http://plugins.jquery.com/project/jqScroller/</a><br />
+		<br />
+	For support and tutorials visit <a href="http://maxvergelli.wordpress.com/">http://maxvergelli.wordpress.com/</a></p></td>
+  </tr>
+  <tr>
+    <td colspan="2">
+		<h2>Create scrolling text and animations with jQuery!</h2>
+		<p align="justify">With jQuery Scroller you can create easily smart scrolling text, news ticker, <br />
+		  or image animations with few lines of code in jQuery! <br />
+	      <br />
+		  You can set many options like...<br />
+		  <br />
+		  - velocity, horizontal or vertical direction, starting/ending points, finite or infinite loops, move type ('linear' or 'ping pong'), <br />
+		  - configure mouseover/mouseout events or control programmatically scrolling functions from an external element,<br />
+		  - play, pause, resume scrolling animations or set a custom  pointer.<br />
+	      <br />
+          <em>Fully supported by Internet Explorer 6+, Firefox, Opera 9+, Safari</em></p>
+	</td>
+  </tr>
+</table>
+<div style="margin-left:40px">
+<br />
+<h3>List of scrolling examples:</h3>
+<p>Just take a look at the source of this page to learn how the scripts work.</p>
+<br />
+<br />
+  
+<b>Animating an image...</b>
+<div class="horizontal_scroller" id="soccer_ball_container">
+	<div class="scrollingtext">
+		<img src="soccer_ball.gif" id="soccer_ball" />
+	</div>
+</div>
+
+<br />
+<br />
+<br />
+
+<b>Simple scrolling text...</b>
+<div class="horizontal_scroller" id="no_mouse_events">
+	<div class="scrollingtext">
+		this is a scrolling text!
+	</div>
+</div>
+
+<br />
+<br />
+<br />
+
+<b>Scrolling text that pause on mouse over and resume on mouse out...</b>
+<div class="horizontal_scroller">
+	<div class="scrollingtext">
+		this is a simple scrolling text!
+	</div>
+</div>
+
+<br />
+<br />
+<br />
+
+<b>It's possible to control the scrolling outside the scroller...</b>
+<div class="horizontal_scroller" id="scrollercontrol">
+	<div class="scrollingtext">
+		this is another horizontal scrolling text!
+	</div>
+</div>
+<br />
+<span id="play_scrollercontrol">play</span> <span id="stop_scrollercontrol">pause</span>
+
+<br />
+<br />
+<br />
+<br />
+
+<b>Vertical scrolling</b>
+<div class="vertical_scroller" style="width:150px; height:200px">
+	<div class="scrollingtext" style="margin-left:20px">
+		just a<br />
+		vertical<br />
+		scrolling<br />
+		text!
+	</div>
+</div>
+
+<br />
+<br />
+<br />
+
+
+<h3>jQuery Scroller plugin &copy; 2010 Max Vergelli</h3>
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+button {
+	width: 20px;
+	height: 20px;
+}
+
+.ui-icon {
+	text-align:center;
+}
+
+.playlist-entry {
+	padding: 0;
+	margin: 0;
+}

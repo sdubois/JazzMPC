@@ -4,10 +4,14 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.min.js"></script>
 <script type="text/javascript">
 function _mpd_ajax(cmd,cb) {
-	var command = cmd[0];
+	var command = cmd.shift();
 	var arg = new Object;
-	if (cmd[1]) arg["a"] = cmd[1];
-	if (cmd[2]) arg["b"] = cmd[2];
+	var i = 0;
+
+	while (cmd.length > 0) {
+		arg[++i] = cmd.shift();
+	}
+
 
 	$.ajax('/mpd/' + command, { complete: cb, data: arg, type: 'POST' });
 }
