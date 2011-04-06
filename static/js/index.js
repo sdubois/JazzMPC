@@ -85,7 +85,7 @@ $(function(){
 
 
 	function update_current_song() {
-		$.ajax('/mpd/currentsong',{ type: 'POST', success: function(data) {
+		$.ajax('/mpd/currentsong',{ async: false, type: 'POST', success: function(data) {
 			currentsong = JSON.parse(data);
 		}});
 	}
@@ -93,9 +93,19 @@ $(function(){
 	function update_current_time() {
 		currentTime++;
 		$(".current-song-progress").progressbar("option","value",(currentTime/endTime)*100);
+		$(".current-song-time").html(format_time(currentTime) + " / " + format_time(endTime));
+	}
+
+	function format_time(time) {
+		var timeString = Math.floor(time / 60).toString() + ":";
+		timeString += ((time % 60) >= 10) ? (time % 60).toString() : "0" + (time % 60).toString();
+		return timeString;
 	}
 
 	function current_song_start_animation() {
+		update_current_song();
+		$(".current-song-name").html(currentsong.Artist + " - " + currentsong.Title + " (" + currentsong.Album + ")");
+
 		clearInterval(intervalId);
 		$("#current-song-block").animate({'height': '4em'},{duration: 600});
 		currentTime = mpdstatus.time.split(":")[0];
@@ -116,7 +126,6 @@ $(function(){
 	function update_status() {
 		$.ajax('/mpd/status',{ async: false, type: 'POST', success: function(data) {
 			mpdstatus = JSON.parse(data);
-			$("#status").html('MPD is ' + mpdstatus.state);
 
 			if (mpdstatus.state == "play") {
 				current_song_start_animation();
@@ -134,7 +143,10 @@ $(function(){
 		console.log(data);
 		if (data.match(/^OK IDLESOCKET/)) { // nothing
 		} else {
-			update_status();
+			var dataObj = JSON.parse(data);
+			if (dataObj.changed == "player") {
+				update_status();
+			}
 		}
 	});
 
