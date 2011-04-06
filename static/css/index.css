@@ -7,13 +7,17 @@ button {
 	text-align:center;
 }
 
+#status {
+	float: left;
+}
+
 .playlist-entry {
 	padding: 0;
 	margin: 0;
 }
 
 #current-song-block {
-	height: 4em;
+	height: 0;
 	width: 100%;
 	padding: 0;
 	background-color: white;
@@ -24,7 +28,9 @@ button {
 
 .current-song-progress {
 	position: absolute;
-	bottom: 1em;
-	
+	bottom: .5em;
+	left: .5em;	
+
 	width: 70%;
+	height: 1em;
 }

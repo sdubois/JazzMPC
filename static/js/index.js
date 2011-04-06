@@ -30,7 +30,7 @@ function _mpd_cmd_fn(cmd) {
 	}
 }
 
-var mpdstatus;
+var mpdstatus,currentsong,currentTime,endTime,intervalId;
 
 $(function(){
 
@@ -78,20 +78,57 @@ $(function(){
 	$("#next").click(_mpd_cmd_fn(['next']));
 	$("#prev").click(_mpd_cmd_fn(['previous']));
 	$("#stop").click(_mpd_cmd_fn(['stop']));
-	$("#current-song-progress").progressbar({
-		value: 0
-	});
+	update_status();
+	if (mpdstatus.state != "stop") {
+		current_song_start_animation();
+	}
 
-	function update_status() {
-		$.ajax('/mpd/status',{ type: 'POST', success: function(data) {
-			mpdstatus = JSON.parse(data);
-			$("#status").html('MPD is ' + mpdstatus.state);
+
+	function update_current_song() {
+		$.ajax('/mpd/currentsong',{ type: 'POST', success: function(data) {
+			currentsong = JSON.parse(data);
 		}});
 	}
 
-//	update_status();
+	function update_current_time() {
+		currentTime++;
+		$(".current-song-progress").progressbar("option","value",(currentTime/endTime)*100);
+	}
 
-/*	var idleSocket = new io.Socket("the-mu.student.rit.edu");
+	function current_song_start_animation() {
+		clearInterval(intervalId);
+		$("#current-song-block").animate({'height': '4em'},{duration: 600});
+		currentTime = mpdstatus.time.split(":")[0];
+		endTime = mpdstatus.time.split(":")[1];
+		$(".current-song-progress").progressbar({ value: ((currentTime/endTime)*100) });
+		intervalId = setInterval(update_current_time,1000);
+	}
+
+	function current_song_suspend_animation() {
+		clearInterval(intervalId);
+	}
+
+	function current_song_stop_animation() {
+		$("#current-song-block").animate({'height': '0'},{duration: 600});
+		$(".current-song-progress").progressbar("destroy");
+	}
+
+	function update_status() {
+		$.ajax('/mpd/status',{ async: false, type: 'POST', success: function(data) {
+			mpdstatus = JSON.parse(data);
+			$("#status").html('MPD is ' + mpdstatus.state);
+
+			if (mpdstatus.state == "play") {
+				current_song_start_animation();
+			} else if (mpdstatus.state == "pause") {
+				current_song_suspend_animation();
+			} else if (mpdstatus.state == "stop") {
+				current_song_stop_animation();
+			}
+		}});
+	}
+
+	var idleSocket = new io.Socket("the-mu.student.rit.edu");
 	idleSocket.connect();
 	idleSocket.on('message',function(data) {
 		console.log(data);
@@ -101,6 +138,7 @@ $(function(){
 		}
 	});
 
+/*
 	$("#playlist_text").SetScroller({   velocity: '60',
 	                                    direction: 'horizontal',
 	                                    onmouseover: 'play',

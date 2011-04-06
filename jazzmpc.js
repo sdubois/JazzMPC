@@ -137,22 +137,24 @@ mpd.on('connect',function() {
 	mpd2.on('connect',idleLoop);
 	mpd2.on('disconnect',function() { mpd2 = net.createConnection(settings.MPD.port,settings.MPD.host); });
 
+	mpd2.on('data',function(data) {
+		if (!(data.match(/^OK MPD/))) {
+			var r = { '_OK': false };
+			var lines = data.split("\n");
+			for (var i in lines) {
+				if (lines[i].match(/^changed/)) {
+					r.changed = lines[i].substr((lines[i].indexOf(":"))+2);
+					r._OK = true;
+				}
+			}
+			mpd2.write("idle\n");
+			console.log(r);
+			idlesocket.broadcast(JSON.stringify(r));
+		}
+	});
+
 	idlesocket.on("connection",function(connection) {
 	   connection.send("OK IDLESOCKET");
-	   mpd2.removeAllListeners('data');
-	   mpd2.on('data',function(data) {
-		var r = { '_OK': false };
-		var lines = data.split("\n");
-		for (var i in lines) {
-			if (lines[i].match(/^changed/)) {
-				r.changed = lines[i].substr((lines[i].indexOf(":"))+2);
-				r._OK = true;
-			}
-		}
-		mpd2.write("idle\n");
-		console.log(r);
-		connection.broadcast(JSON.stringify(r));
-	   });
 	});
 
 });
