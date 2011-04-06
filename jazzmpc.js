@@ -18,7 +18,7 @@ mpd.on('connect',function() {
 	                      'listallinfo','lsinfo','update','rescan','disableoutput',
 	                      'enableoutput','outputs','commands','notcommands',
 	                      'tagtypes','urlhandlers','command_list_end','channels','readmessages',
-	                      'consume','crossfade','mixrampdb','mixrampdelay',
+	                      'consume','crossfade','mixrampdb','mixrampdelay','move','moveid',
 	                      'random','repeat','setvol','single','replay_gain_mode',
 	                      'pause','play','playid','password','add','delete','deleteid',
 	                      'playlistinfo','playlistid','plchanges','plchangesposid',
@@ -32,6 +32,20 @@ mpd.on('connect',function() {
 	for (var i in simpleFuncList) {
 		mpdfn(simpleFuncList[i]);
 	}
+
+	var mpd_commandlist = function(params) {
+		mpd.send('command_list_ok_begin',null);
+		var output = "";
+		for (var i in params) {
+			mpd.send(params[i],function(data) {
+				if (typeof(data) != 'undefined') output += JSON.stringify(JSON.parse(data));
+			});
+		}
+		mpd.send('command_list_end',null);
+		this.end(output + "\n");
+	}
+		
+        routes.addRoute("/mpd/commandlist",mpd_commandlist);	
 
 	function sendFile(path) {
 		var res = this;

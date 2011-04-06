@@ -2,12 +2,11 @@
 
 module.exports = {
 	'MPD': {
-		'host': 'localhost',
+		'host': '192.168.189.130',
 		'port': 6600
 	},
 
 	'JazzMPC': {
-		'host': 'localhost',
 		'port': 80
 	}
 }

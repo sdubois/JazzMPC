@@ -11,3 +11,20 @@ button {
 	padding: 0;
 	margin: 0;
 }
+
+#current-song-block {
+	height: 4em;
+	width: 100%;
+	padding: 0;
+	background-color: white;
+	position: absolute;
+	bottom: 0px;
+	border-top: 1px solid black;
+}
+
+.current-song-progress {
+	position: absolute;
+	bottom: 1em;
+	
+	width: 70%;
+}
