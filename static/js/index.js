@@ -33,7 +33,6 @@ function _mpd_cmd_fn(cmd) {
 var mpdstatus,currentsong,currentTime,endTime,intervalId;
 
 $(function(){
-
         $.ajax('/mpd/playlistinfo',{ type: 'POST', success: function(data) {
 		var playlist = JSON.parse(data);
                 for (var s in playlist) {
@@ -73,6 +72,10 @@ $(function(){
 	        $("#sortable").disableSelection();
         }});
 
+	$(window).scroll(function() {
+		$("#current-song-block").css("bottom",0);
+	});
+
 	$("#play").click(_mpd_cmd_fn(['play']));
 	$("#pause").click(_mpd_cmd_fn(['pause']));
 	$("#next").click(_mpd_cmd_fn(['next']));
@@ -107,6 +110,7 @@ $(function(){
 		$(".current-song-name").html(currentsong.Artist + " - " + currentsong.Title + " (" + currentsong.Album + ")");
 
 		clearInterval(intervalId);
+		$(".current-song-time").css('display','block');
 		$("#current-song-block").animate({'height': '4em'},{duration: 600});
 		currentTime = mpdstatus.time.split(":")[0];
 		endTime = mpdstatus.time.split(":")[1];
@@ -119,8 +123,10 @@ $(function(){
 	}
 
 	function current_song_stop_animation() {
+		current_song_suspend_animation();
 		$("#current-song-block").animate({'height': '0'},{duration: 600});
 		$(".current-song-progress").progressbar("destroy");
+		$(".current-song-time").css('display','none');
 	}
 
 	function update_status() {
@@ -137,7 +143,7 @@ $(function(){
 		}});
 	}
 
-	var idleSocket = new io.Socket("the-mu.student.rit.edu");
+	var idleSocket = new io.Socket();
 	idleSocket.connect();
 	idleSocket.on('message',function(data) {
 		console.log(data);
