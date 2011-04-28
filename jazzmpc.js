@@ -37,14 +37,14 @@ mpd.on('connect',function() {
 	                      'clear','playlistinfo','shuffle','listplaylists','listall',
 	                      'listallinfo','lsinfo','update','rescan','disableoutput',
 	                      'enableoutput','outputs','commands','notcommands',
-	                      'tagtypes','urlhandlers','command_list_end','channels','readmessages',
+	                      'tagtypes','urlhandlers','channels','readmessages',
 	                      'consume','crossfade','mixrampdb','mixrampdelay','move','moveid',
 	                      'random','repeat','setvol','single','replay_gain_mode',
 	                      'pause','play','playid','password','add','delete','deleteid',
 	                      'playlistinfo','playlistid','plchanges','plchangesposid',
 	                      'shuffle','listplaylist','listplaylistinfo','load',
 	                      'playlistclear','rm','save','listall','listallinfo',
-	                      'lsinfo','subscribe','unsubscribe','command_list_begin',
+	                      'lsinfo','subscribe','unsubscribe',
 	                      'seek','seekid','addid','swap','swapid','playlistid',
 	                      'playlistdelete','playlistmove','rename','count','find',
 	                      'findadd','list','search','sendmessage'];
@@ -53,18 +53,6 @@ mpd.on('connect',function() {
 		mpdfn(simpleFuncList[i]);
 	}
 
-	var mpd_commandlist = function(params) {
-		mpd.send('command_list_ok_begin',null);
-		var output = "";
-		for (var i in params) {
-			mpd.send(params[i],function(data) {
-				if (typeof(data) != 'undefined') output += JSON.stringify(JSON.parse(data));
-			});
-		}
-		mpd.send('command_list_end',null);
-		this.end(output + "\n");
-	}
-		
         routes.addRoute("/mpd/commandlist",mpd_commandlist);	
 
 	function sendFile(path) {
