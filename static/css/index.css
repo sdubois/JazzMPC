@@ -21,9 +21,11 @@ button {
 	width: 100%;
 	padding: 0;
 	background-color: white;
-	position: absolute;
-	bottom: 0px;
+	position: fixed;
+	bottom: 0;
 	border-top: 1px solid black;
+
+	margin-bottom: 0px;
 }
 
 .current-song-name {
@@ -52,4 +54,8 @@ button {
 
 	width: 20%;
 	height: 1em;
+}
+
+#errdialog {
+	display:none;
 }

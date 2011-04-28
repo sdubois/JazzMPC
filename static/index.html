@@ -8,6 +8,7 @@
 <script type="text/javascript" src="/js/jquery/jquery-ui-1.8.11.custom.min.js"></script>
 <script type="text/javascript" src="/js/jquery.Scroller-1.0.min.js"></script>
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/js/obj/mpd.js"></script>
 <script type="text/javascript" src="/js/index.js"></script>
 </head>
 <body>
@@ -27,9 +28,10 @@
 <div class="playlist">
   <ul id="sortable"/>
 </div>
-<div id="current-song-block">
-  <div class="current-song-name ui-state-default"></div>
+<div id="current-song-block" class="ui-state-default">
+  <div class="current-song-name"></div>
   <div class="current-song-progress"></div>
   <div class="current-song-time ui-state-default"</div>
 </div>
+<div id="errdialog"></div>
 </body>

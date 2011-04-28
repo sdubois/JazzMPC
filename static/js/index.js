@@ -1,44 +1,32 @@
-function _mpd_cmd(cmd) {
-	var command = cmd.shift();
-	var arg = new Object;
-	var i = 0;
-
-	while (cmd.length > 0) {
-		arg[++i] = cmd.shift();
-	}
-
-	$.ajax('/mpd/' + command,{ type: 'POST', data: arg, success: function(data) {
-		var resp = JSON.parse(data);
-		if (!(resp._OK)) window.alert("Something went wrong!");
- 	}});
-}
-
-function _mpd_cmd_fn(cmd) {
-	var command = cmd.shift();
-	var arg = new Object;
-	var i = 0;
-
-	while (cmd.length > 0) {
-		arg[++i] = cmd.shift();
-	}
-
-	return function() {
-		$.ajax('/mpd/' + command,{ type: 'POST', data: arg, success: function(data) {
-			var resp = JSON.parse(data);
-			if (!(resp._OK)) window.alert("Something went wrong!");
- 		}});
-	}
-}
+/*******************************
+**   index.js :: Javascript for the playlist page of JazzMPC
+**
+**   This file is part of JazzMPC.
+**
+**   JazzMPC is free software: you can redistribute it and/or modify
+**   it under the terms of the GNU General Public License as published by
+**   the Free Software Foundation, either version 3 of the License, or
+**   (at your option) any later version.
+**
+**   JazzMPC is distributed in the hope that it will be useful,
+**   but WITHOUT ANY WARRANTY; without even the implied warranty of
+**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**   GNU General Public License for more details.
+**
+**   You should have received a copy of the GNU General Public License
+**   along with JazzMPC.  If not, see <http://www.gnu.org/licenses/>.
+**
+*******************************/
 
 var mpdstatus,currentsong,currentTime,endTime,intervalId;
 
 $(function(){
-        $.ajax('/mpd/playlistinfo',{ type: 'POST', success: function(data) {
+        mpd.send('playlistinfo',null,null,function(data) {
 		var playlist = JSON.parse(data);
                 for (var s in playlist) {
 			if (typeof playlist[s] == 'object') {
         	                var liText = playlist[s].Artist + ' - ' + playlist[s].Title + ' (' + playlist[s].Album + ') / ' + Math.floor(playlist[s].Time / 60) + ':' + (playlist[s].Time % 60);
-                	        $("#sortable").append('<li id="' + playlist[s].Id + '" class="ui-state-default playlist-entry"><button class="playsong ui-button ui-widget ui-state-default ui-corner-all" role="button" aria-disabled="false"><div class="ui-icon ui-icon-play" onclick=\'_mpd_cmd(["playid","' + playlist[s].Id + '"])\' /></button>&nbsp;' + liText + '&nbsp;<div class="dragger ui-button ui-widget ui-state-default ui-corner-all" role="button" aria-disabled="false"><div class="ui-icon ui-icon-arrowthick-2-n-s" /></div></li>');
+                	        $("#sortable").append('<li id="' + playlist[s].Id + '" class="ui-state-default playlist-entry"><button class="playsong ui-button ui-widget ui-state-default ui-corner-all" role="button" aria-disabled="false"><div class="ui-icon ui-icon-play" onclick=\'mpd.send("playid",["' + playlist[s].Id + '"])\' /></button>&nbsp;' + liText + '&nbsp;<div class="dragger ui-button ui-widget ui-state-default ui-corner-all" role="button" aria-disabled="false"><div class="ui-icon ui-icon-arrowthick-2-n-s" /></div></li>');
 			}
                 }
 
@@ -70,17 +58,17 @@ $(function(){
 			$.ajax('/mpd/moveid',{ type: 'POST', data: { a: moved, b: movedTo } });
 		}});
 	        $("#sortable").disableSelection();
-        }});
+        });
 
-	$(window).scroll(function() {
-		$("#current-song-block").css("bottom",0);
-	});
+//	$(window).scroll(function() {
+//		$("#current-song-block").css("margin-bottom",($(document).height() - $(window).scrollTop() - $(window).height()) + "px");
+//	});
 
-	$("#play").click(_mpd_cmd_fn(['play']));
-	$("#pause").click(_mpd_cmd_fn(['pause']));
-	$("#next").click(_mpd_cmd_fn(['next']));
-	$("#prev").click(_mpd_cmd_fn(['previous']));
-	$("#stop").click(_mpd_cmd_fn(['stop']));
+	$("#play").click(mpd._send('play'));
+	$("#pause").click(mpd._send('pause'));
+	$("#next").click(mpd._send('next'));
+	$("#prev").click(mpd._send('previous'));
+	$("#stop").click(mpd._send('stop'));
 	update_status();
 	if (mpdstatus.state != "stop") {
 		current_song_start_animation();
@@ -88,9 +76,9 @@ $(function(){
 
 
 	function update_current_song() {
-		$.ajax('/mpd/currentsong',{ async: false, type: 'POST', success: function(data) {
+		mpd.send('currentsong',null,{ async: false },function(data) {
 			currentsong = JSON.parse(data);
-		}});
+		});
 	}
 
 	function update_current_time() {
@@ -130,7 +118,7 @@ $(function(){
 	}
 
 	function update_status() {
-		$.ajax('/mpd/status',{ async: false, type: 'POST', success: function(data) {
+		mpd.send('status',null,{ async: false },function(data) {
 			mpdstatus = JSON.parse(data);
 
 			if (mpdstatus.state == "play") {
@@ -140,7 +128,7 @@ $(function(){
 			} else if (mpdstatus.state == "stop") {
 				current_song_stop_animation();
 			}
-		}});
+		});
 	}
 
 	var idleSocket = new io.Socket();
@@ -155,6 +143,8 @@ $(function(){
 			}
 		}
 	});
+
+	idleSocket.on('disconnect',function() { idleSocket.connect(); });
 
 /*
 	$("#playlist_text").SetScroller({   velocity: '60',

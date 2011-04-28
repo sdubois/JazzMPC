@@ -1,3 +1,23 @@
+/*******************************
+**   jazzmpc.js :: JazzMPC HTTP backend
+**
+**   This file is part of JazzMPC.
+**
+**   JazzMPC is free software: you can redistribute it and/or modify
+**   it under the terms of the GNU General Public License as published by
+**   the Free Software Foundation, either version 3 of the License, or
+**   (at your option) any later version.
+**
+**   JazzMPC is distributed in the hope that it will be useful,
+**   but WITHOUT ANY WARRANTY; without even the implied warranty of
+**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**   GNU General Public License for more details.
+**
+**   You should have received a copy of the GNU General Public License
+**   along with JazzMPC.  If not, see <http://www.gnu.org/licenses/>.
+**
+*******************************/
+
 var routes = new require('routes').Router();
 var http = require('http');
 var fs = require('fs');
@@ -90,6 +110,7 @@ mpd.on('connect',function() {
 		routes.addRoute(route,eval("mpd_" + req));
 	}
 	
+	routes.addRoute('/',function() { sendFile.call(this,"/index.html"); });
 	routes.addRoute('^/*$',sendFile);
 
 	//initialize server
@@ -148,7 +169,6 @@ mpd.on('connect',function() {
 				}
 			}
 			mpd2.write("idle\n");
-			console.log(r);
 			idlesocket.broadcast(JSON.stringify(r));
 		}
 	});
